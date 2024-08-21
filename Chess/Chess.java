@@ -31,6 +31,9 @@ public class Chess extends JFrame {
         contents = getContentPane();
         contents.setLayout(new GridLayout(8, 8));
 
+        Image icon = Toolkit.getDefaultToolkit().getImage("images/chess.png");
+        setIconImage(icon);
+
         
         whiteKnight = loadAndScaleIcon("images/white_knight.png");
         blackKnight = loadAndScaleIcon("images/black_knight.png");
@@ -156,6 +159,14 @@ public class Chess extends JFrame {
     }
 
     private void processClick(int i, int j) {
+        if (selectedRow == i && selectedCol == j) {
+            //qe tash nese e bon click apet e bon deselect
+            squares[selectedRow][selectedCol].setBorder(BorderFactory.createEmptyBorder());
+            selectedRow = -1;
+            selectedCol = -1;
+            return;
+        }
+    
         if (selectedRow == -1 || selectedCol == -1) {
             if (board[i][j] != null) {
                 Piece piece = board[i][j];
@@ -163,7 +174,7 @@ public class Chess extends JFrame {
                     if (selectedRow != -1 && selectedCol != -1) {
                         squares[selectedRow][selectedCol].setBorder(BorderFactory.createEmptyBorder());
                     }
-
+    
                     selectedRow = i;
                     selectedCol = j;
                     squares[i][j].setBorder(BorderFactory.createLineBorder(Color.RED, 3));
@@ -174,20 +185,21 @@ public class Chess extends JFrame {
             if (!isValidMove(i, j)) {
                 return;
             }
-
+    
             if (board[i][j] != null && board[i][j].getColor().equals(board[selectedRow][selectedCol].getColor())) {
                 return;
             }
-
+    
             board[i][j] = board[selectedRow][selectedCol];
             board[selectedRow][selectedCol] = null;
             selectedRow = -1;
             selectedCol = -1;
-
+    
             updateBoardDisplay();
             switchPlayer();
         }
     }
+    
 
     private void switchPlayer() {
         currentPlayer = currentPlayer.equals("white") ? "black" : "white";
