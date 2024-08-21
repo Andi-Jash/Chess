@@ -158,9 +158,115 @@ public class Chess extends JFrame {
         }
     }
 
+    private boolean isKingInCheck() {
+        int kingRow = -1;
+        int kingCol = -1;
+    
+        
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                Piece piece = board[i][j];
+                if (piece != null && piece.getType().equals("king") && piece.getColor().equals(currentPlayer)) {
+                    kingRow = i;
+                    kingCol = j;
+                    break;
+                }
+            }
+            if (kingRow != -1) break;
+        }
+    
+        if (kingRow == -1) {
+            throw new RuntimeException("King not found for player " + currentPlayer);
+        }
+    
+        
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                Piece attackingPiece = board[i][j];
+                if (attackingPiece != null && !attackingPiece.getColor().equals(currentPlayer)) {
+                    Player opponent = attackingPiece.getColor().equals("black") ? blackPieces : whitePieces;
+    
+                    switch (attackingPiece.getType()) {
+                        case "knight":
+                            if (opponent.isValidKnightMove(kingRow, kingCol, i, j)) return true;
+                            break;
+                        case "bishop":
+                            if (opponent.isValidBishopMove(kingRow, kingCol, i, j)) return true;
+                            break;
+                        case "rook":
+                            if (opponent.isValidRookMove(kingRow, kingCol, i, j, board)) return true;
+                            break;
+                        case "queen":
+                            if (opponent.isValidQueenMove(kingRow, kingCol, i, j, board)) return true;
+                            break;
+                        case "pawn":
+                            if (opponent.isValidPawnMove(kingRow, kingCol, i, j, board)) return true;
+                            break;
+                    }
+                }
+            }
+        }
+    
+        return false;
+    }
+    
+
+
+    private boolean canKingMoveToSafety() {
+        int kingRow = -1;
+        int kingCol = -1;
+    
+        
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                Piece piece = board[i][j];
+                if (piece != null && piece.getType().equals("king") && piece.getColor().equals(currentPlayer)) {
+                    kingRow = i;
+                    kingCol = j;
+                    break;
+                }
+            }
+            if (kingRow != -1) break;
+        }
+    
+        if (kingRow == -1) {
+            throw new RuntimeException("King not found for player " + currentPlayer);
+        }
+    
+        
+        for (int i = kingRow - 1; i <= kingRow + 1; i++) {
+            for (int j = kingCol - 1; j <= kingCol + 1; j++) {
+                if (i >= 0 && i < 8 && j >= 0 && j < 8 && (i != kingRow || j != kingCol)) {
+                    Piece targetPiece = board[i][j];
+                    if (targetPiece == null || !targetPiece.getColor().equals(currentPlayer)) {
+                        
+                        Piece originalPiece = board[i][j];
+                        board[i][j] = board[kingRow][kingCol];
+                        board[kingRow][kingCol] = null;
+    
+                        
+                        boolean isInCheck = isKingInCheck();
+    
+                        
+                        board[kingRow][kingCol] = board[i][j];
+                        board[i][j] = originalPiece;
+    
+                        if (!isInCheck) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+    
+        return false;
+    }
+    
+    
+    
+    
     private void processClick(int i, int j) {
         if (selectedRow == i && selectedCol == j) {
-            //qe tash nese e bon click apet e bon deselect
             squares[selectedRow][selectedCol].setBorder(BorderFactory.createEmptyBorder());
             selectedRow = -1;
             selectedCol = -1;
@@ -186,19 +292,48 @@ public class Chess extends JFrame {
                 return;
             }
     
-            if (board[i][j] != null && board[i][j].getColor().equals(board[selectedRow][selectedCol].getColor())) {
+            Piece movingPiece = board[selectedRow][selectedCol];
+            Piece targetPiece = board[i][j];
+    
+            
+            board[i][j] = movingPiece;
+            board[selectedRow][selectedCol] = null;
+    
+            boolean isInCheckAfterMove = isKingInCheck();
+            if (isInCheckAfterMove) {
+                
+                board[selectedRow][selectedCol] = movingPiece;
+                board[i][j] = targetPiece;
+    
+                JOptionPane.showMessageDialog(this, "Invalid move: King is in check.");
+                selectedRow = -1;
+                selectedCol = -1;
+                updateBoardDisplay();
                 return;
             }
     
-            board[i][j] = board[selectedRow][selectedCol];
+            
+            board[i][j] = movingPiece;
             board[selectedRow][selectedCol] = null;
             selectedRow = -1;
             selectedCol = -1;
     
             updateBoardDisplay();
-            switchPlayer();
+    
+            
+            if (isKingInCheck()) {
+                if (canKingMoveToSafety()) {
+                    JOptionPane.showMessageDialog(this, "Your king is in check, but can move to safety.");
+                } else {
+                    JOptionPane.showMessageDialog(this, "Checkmate! Your king is in check and cannot move to safety.");
+                    
+                    return;
+                }
+            } else {
+                switchPlayer();
+            }
         }
-    }
+    }    
     
 
     private void switchPlayer() {
