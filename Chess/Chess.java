@@ -417,9 +417,21 @@ public class Chess extends JFrame {
         }
 
         public boolean isValidBishopMove(int i, int j, int startRow, int startCol) {
-            int rowDelta = Math.abs(i - startRow);
-            int colDelta = Math.abs(j - startCol);
-            return rowDelta == colDelta;
+            if (Math.abs(i - startRow) == Math.abs(j - startCol)) {
+                int RowDirection = (i - startRow) > 0 ? 1 : -1;
+                int ColDirection = (j - startCol) > 0 ? 1 : -1;
+                int row = startRow + RowDirection;
+                int col = startCol + ColDirection;
+                while (row != i && col != j){
+                    if (board[row][col] != null) {
+                        return false;
+                    }
+                    row += RowDirection;
+                    col += ColDirection;
+                }
+                return board [i][j] == null || !board[i][j].getColor().equals(board[startRow][startCol].getColor());
+            }
+            return false;
         }
 
         public boolean isValidPawnMove(int i, int j, int startRow, int startCol, Piece[][] board) {
@@ -465,8 +477,41 @@ public class Chess extends JFrame {
         }
 
         public boolean isValidQueenMove(int i, int j, int startRow, int startCol, Piece[][] board) {
-            return isValidRookMove(i, j, startRow, startCol, board) ||
-                   isValidBishopMove(i, j, startRow, startCol);
+            if (i == startRow) {
+                int start = Math.min(j, startCol);
+                int end = Math.max(j, startCol);
+                for (int k = start + 1; k < end; k++) {
+                    if(board[i][k] != null) {
+                        return false;
+                    }
+                }
+                return board[i][end] == null || !board[i][end].getColor().equals(board[startRow][startCol].getColor());
+            }
+            else if (j == startCol) {
+                int start = Math.min(i, startRow);
+                int end = Math.max(i, startRow);
+                for (int k = start + 1; k < end; k++) {
+                    if (board[k][j] != null) {
+                        return false;
+                    }
+                }
+                return board[end][j] == null || !board[end][j].getColor().equals(board[start][startCol].getColor());
+            }
+            else if (Math.abs(i - startRow) == Math.abs(j - startCol)) {
+                int RowDirection = (i - startRow) > 0 ? 1 : -1;
+                int ColDirection = (j - startCol) > 0 ? 1 : -1;
+                int row = startRow + RowDirection;
+                int col = startCol + ColDirection;
+                while (row != i && col != j){
+                    if (board[row][col] != null) {
+                        return false;
+                    }
+                    row += RowDirection;
+                    col += ColDirection;
+                }
+                return board [i][j] == null || !board[i][j].getColor().equals(board[startRow][startCol].getColor());
+            }
+            return false;
         }
 
         public boolean isValidKingMove(int i, int j, int startRow, int startCol, Piece[][] board) {
@@ -498,9 +543,21 @@ public class Chess extends JFrame {
         }
 
         public boolean isValidBishopMove(int i, int j, int startRow, int startCol) {
-            int rowDelta = Math.abs(i - startRow);
-            int colDelta = Math.abs(j - startCol);
-            return rowDelta == colDelta;
+            if (Math.abs(i - startRow) == Math.abs(j - startCol)) {
+                int RowDirection = (i - startRow) > 0 ? 1 : -1;
+                int ColDirection = (j - startCol) > 0 ? 1 : -1;
+                int row = startRow + RowDirection;
+                int col = startCol + ColDirection;
+                while (row != i && col != j){
+                    if (board[row][col] != null) {
+                        return false;
+                    }
+                    row += RowDirection;
+                    col += ColDirection;
+                }
+                return board [i][j] == null || !board[i][j].getColor().equals(board[startRow][startCol].getColor());
+            }
+            return false;
         }
 
         public boolean isValidPawnMove(int i, int j, int startRow, int startCol, Piece[][] board) {
@@ -546,8 +603,41 @@ public class Chess extends JFrame {
         }
 
         public boolean isValidQueenMove(int i, int j, int startRow, int startCol, Piece[][] board) {
-            return isValidRookMove(i, j, startRow, startCol, board) ||
-                   isValidBishopMove(i, j, startRow, startCol);
+            if (i == startRow) {
+                int start = Math.min(j, startCol);
+                int end = Math.max(j, startCol);
+                for (int k = start + 1; k < end; k++) {
+                    if(board[i][k] != null) {
+                        return false;
+                    }
+                }
+                return board[i][end] == null || !board[i][end].getColor().equals(board[startRow][startCol].getColor());
+            }
+            else if (j == startCol) {
+                int start = Math.min(i, startRow);
+                int end = Math.max(i, startRow);
+                for (int k = start + 1; k < end; k++) {
+                    if (board[k][j] != null) {
+                        return false;
+                    }
+                }
+                return board[end][j] == null || !board[end][j].getColor().equals(board[start][startCol].getColor());
+            }
+            else if (Math.abs(i - startRow) == Math.abs(j - startCol)) {
+                int RowDirection = (i - startRow) > 0 ? 1 : -1;
+                int ColDirection = (j - startCol) > 0 ? 1 : -1;
+                int row = startRow + RowDirection;
+                int col = startCol + ColDirection;
+                while (row != i && col != j){
+                    if (board[row][col] != null) {
+                        return false;
+                    }
+                    row += RowDirection;
+                    col += ColDirection;
+                }
+                return board [i][j] == null || !board[i][j].getColor().equals(board[startRow][startCol].getColor());
+            }
+            return false;
         }
 
         public boolean isValidKingMove(int i, int j, int startRow, int startCol, Piece[][] board) {
