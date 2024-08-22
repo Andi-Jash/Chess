@@ -413,8 +413,10 @@ public class Chess extends JFrame {
         public boolean isValidKnightMove(int i, int j, int startRow, int startCol) {
             int rowDelta = Math.abs(i - startRow);
             int colDelta = Math.abs(j - startCol);
-            return (rowDelta == 1 && colDelta == 2) || (rowDelta == 2 && colDelta == 1);
-        }
+            boolean isValidMove = (rowDelta == 1 && colDelta == 2) || (rowDelta == 2 && colDelta == 1);
+            return isValidMove && (board[i][j] == null || !board[i][j].getColor().equals(board[startRow][startCol].getColor()));
+        }        
+        
 
         public boolean isValidBishopMove(int i, int j, int startRow, int startCol) {
             if (Math.abs(i - startRow) == Math.abs(j - startCol)) {
@@ -422,17 +424,19 @@ public class Chess extends JFrame {
                 int ColDirection = (j - startCol) > 0 ? 1 : -1;
                 int row = startRow + RowDirection;
                 int col = startCol + ColDirection;
-                while (row != i && col != j){
+                while (row != i && col != j) {
                     if (board[row][col] != null) {
                         return false;
                     }
                     row += RowDirection;
                     col += ColDirection;
                 }
-                return board [i][j] == null || !board[i][j].getColor().equals(board[startRow][startCol].getColor());
+                
+                return board[i][j] == null || !board[i][j].getColor().equals(board[startRow][startCol].getColor());
             }
             return false;
         }
+        
 
         public boolean isValidPawnMove(int i, int j, int startRow, int startCol, Piece[][] board) {
             int direction = 1; 
@@ -462,7 +466,7 @@ public class Chess extends JFrame {
                         return false;
                     }
                 }
-                return true;
+                return board[i][end] == null || !board[i][end].getColor().equals(board[startRow][startCol].getColor());
             } else if (j == startCol) {
                 int start = Math.min(i, startRow);
                 int end = Math.max(i, startRow);
@@ -471,10 +475,11 @@ public class Chess extends JFrame {
                         return false;
                     }
                 }
-                return true;
+                return board[end][j] == null || !board[end][j].getColor().equals(board[startRow][startCol].getColor());
             }
             return false;
         }
+        
 
         public boolean isValidQueenMove(int i, int j, int startRow, int startCol, Piece[][] board) {
             if (i == startRow) {
@@ -539,8 +544,10 @@ public class Chess extends JFrame {
         public boolean isValidKnightMove(int i, int j, int startRow, int startCol) {
             int rowDelta = Math.abs(i - startRow);
             int colDelta = Math.abs(j - startCol);
-            return (rowDelta == 1 && colDelta == 2) || (rowDelta == 2 && colDelta == 1);
+            boolean isValidMove = (rowDelta == 1 && colDelta == 2) || (rowDelta == 2 && colDelta == 1);
+            return isValidMove && (board[i][j] == null || !board[i][j].getColor().equals(board[startRow][startCol].getColor()));
         }
+        
 
         public boolean isValidBishopMove(int i, int j, int startRow, int startCol) {
             if (Math.abs(i - startRow) == Math.abs(j - startCol)) {
@@ -548,17 +555,19 @@ public class Chess extends JFrame {
                 int ColDirection = (j - startCol) > 0 ? 1 : -1;
                 int row = startRow + RowDirection;
                 int col = startCol + ColDirection;
-                while (row != i && col != j){
+                while (row != i && col != j) {
                     if (board[row][col] != null) {
                         return false;
                     }
                     row += RowDirection;
                     col += ColDirection;
                 }
-                return board [i][j] == null || !board[i][j].getColor().equals(board[startRow][startCol].getColor());
+                
+                return board[i][j] == null || !board[i][j].getColor().equals(board[startRow][startCol].getColor());
             }
             return false;
         }
+        
 
         public boolean isValidPawnMove(int i, int j, int startRow, int startCol, Piece[][] board) {
             int direction = -1; 
@@ -588,7 +597,7 @@ public class Chess extends JFrame {
                         return false;
                     }
                 }
-                return true;
+                return board[i][end] == null || !board[i][end].getColor().equals(board[startRow][startCol].getColor());
             } else if (j == startCol) {
                 int start = Math.min(i, startRow);
                 int end = Math.max(i, startRow);
@@ -597,10 +606,11 @@ public class Chess extends JFrame {
                         return false;
                     }
                 }
-                return true;
+                return board[end][j] == null || !board[end][j].getColor().equals(board[startRow][startCol].getColor());
             }
             return false;
         }
+        
 
         public boolean isValidQueenMove(int i, int j, int startRow, int startCol, Piece[][] board) {
             if (i == startRow) {
