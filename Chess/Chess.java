@@ -132,7 +132,7 @@ public class Chess extends JFrame {
         if (selectedRow == -1 || selectedCol == -1) {
             return false;
         }
-
+    
         Piece selectedPiece = board[selectedRow][selectedCol];
         switch (selectedPiece.getType()) {
             case "knight":
@@ -157,6 +157,7 @@ public class Chess extends JFrame {
                 return false;
         }
     }
+    
 
     private boolean isKingInCheck() {
         int kingRow = -1;
@@ -295,13 +296,14 @@ public class Chess extends JFrame {
             Piece movingPiece = board[selectedRow][selectedCol];
             Piece targetPiece = board[i][j];
     
-            
+            // Perform the move
             board[i][j] = movingPiece;
             board[selectedRow][selectedCol] = null;
     
+            // Check if the king is in check after the move
             boolean isInCheckAfterMove = isKingInCheck();
             if (isInCheckAfterMove) {
-                
+                // Undo the move
                 board[selectedRow][selectedCol] = movingPiece;
                 board[i][j] = targetPiece;
     
@@ -312,7 +314,7 @@ public class Chess extends JFrame {
                 return;
             }
     
-            
+            // Finalize the move
             board[i][j] = movingPiece;
             board[selectedRow][selectedCol] = null;
             selectedRow = -1;
@@ -320,20 +322,19 @@ public class Chess extends JFrame {
     
             updateBoardDisplay();
     
-            
             if (isKingInCheck()) {
                 if (canKingMoveToSafety()) {
                     JOptionPane.showMessageDialog(this, "Your king is in check, but can move to safety.");
                 } else {
                     JOptionPane.showMessageDialog(this, "Checkmate! Your king is in check and cannot move to safety.");
-                    
                     return;
                 }
             } else {
                 switchPlayer();
             }
         }
-    }    
+    }
+        
     
 
     private void switchPlayer() {
@@ -458,70 +459,40 @@ public class Chess extends JFrame {
         }
 
         public boolean isValidRookMove(int i, int j, int startRow, int startCol, Piece[][] board) {
-            if (i == startRow) {
-                int start = Math.min(j, startCol);
-                int end = Math.max(j, startCol);
-                for (int k = start + 1; k < end; k++) {
-                    if (board[i][k] != null) {
-                        return false;
+            if (i == startRow || j == startCol) {
+                int rowDirection = Integer.signum(i - startRow);
+                int colDirection = Integer.signum(j - startCol);
+                int row = startRow + rowDirection;
+                int col = startCol + colDirection;
+        
+                while (row != i || col != j) {
+                    if (board[row][col] != null) {
+                        return false; // Blocked by another piece
                     }
+                    row += rowDirection;
+                    col += colDirection;
                 }
-                return board[i][end] == null || !board[i][end].getColor().equals(board[startRow][startCol].getColor());
-            } else if (j == startCol) {
-                int start = Math.min(i, startRow);
-                int end = Math.max(i, startRow);
-                for (int k = start + 1; k < end; k++) {
-                    if (board[k][j] != null) {
-                        return false;
-                    }
-                }
-                return board[end][j] == null || !board[end][j].getColor().equals(board[startRow][startCol].getColor());
+        
+                return board[i][j] == null || !board[i][j].getColor().equals(board[startRow][startCol].getColor());
             }
             return false;
         }
         
-
         public boolean isValidQueenMove(int i, int j, int startRow, int startCol, Piece[][] board) {
-            if (i == startRow) {
-                int start = Math.min(j, startCol);
-                int end = Math.max(j, startCol);
-                for (int k = start + 1; k < end; k++) {
-                    if(board[i][k] != null) {
-                        return false;
-                    }
-                }
-                return board[i][end] == null || !board[i][end].getColor().equals(board[startRow][startCol].getColor());
-            }
-            else if (j == startCol) {
-                int start = Math.min(i, startRow);
-                int end = Math.max(i, startRow);
-                for (int k = start + 1; k < end; k++) {
-                    if (board[k][j] != null) {
-                        return false;
-                    }
-                }
-                return board[end][j] == null || !board[end][j].getColor().equals(board[start][startCol].getColor());
-            }
-            else if (Math.abs(i - startRow) == Math.abs(j - startCol)) {
-                int RowDirection = (i - startRow) > 0 ? 1 : -1;
-                int ColDirection = (j - startCol) > 0 ? 1 : -1;
-                int row = startRow + RowDirection;
-                int col = startCol + ColDirection;
-                while (row != i && col != j){
-                    if (board[row][col] != null) {
-                        return false;
-                    }
-                    row += RowDirection;
-                    col += ColDirection;
-                }
-                return board [i][j] == null || !board[i][j].getColor().equals(board[startRow][startCol].getColor());
-            }
-            return false;
+            return isValidRookMove(i, j, startRow, startCol, board) || isValidBishopMove(i, j, startRow, startCol);
         }
+        
 
         public boolean isValidKingMove(int i, int j, int startRow, int startCol, Piece[][] board) {
-            return Math.abs(i - startRow) <= 1 && Math.abs(j - startCol) <= 1;
-        }
+
+            boolean isMoveInRange = Math.abs(i - startRow) <= 1 && Math.abs(j - startCol) <= 1;
+            
+
+            boolean isTargetSquareValid = board[i][j] == null || !board[i][j].getColor().equals(board[startRow][startCol].getColor());
+            
+            return isMoveInRange && isTargetSquareValid;
+        }        
+        
     }
 
     private class White extends Player {
@@ -589,69 +560,38 @@ public class Chess extends JFrame {
         }
 
         public boolean isValidRookMove(int i, int j, int startRow, int startCol, Piece[][] board) {
-            if (i == startRow) {
-                int start = Math.min(j, startCol);
-                int end = Math.max(j, startCol);
-                for (int k = start + 1; k < end; k++) {
-                    if (board[i][k] != null) {
-                        return false;
+            if (i == startRow || j == startCol) {
+                int rowDirection = Integer.signum(i - startRow);
+                int colDirection = Integer.signum(j - startCol);
+                int row = startRow + rowDirection;
+                int col = startCol + colDirection;
+        
+                while (row != i || col != j) {
+                    if (board[row][col] != null) {
+                        return false; // Blocked by another piece
                     }
+                    row += rowDirection;
+                    col += colDirection;
                 }
-                return board[i][end] == null || !board[i][end].getColor().equals(board[startRow][startCol].getColor());
-            } else if (j == startCol) {
-                int start = Math.min(i, startRow);
-                int end = Math.max(i, startRow);
-                for (int k = start + 1; k < end; k++) {
-                    if (board[k][j] != null) {
-                        return false;
-                    }
-                }
-                return board[end][j] == null || !board[end][j].getColor().equals(board[startRow][startCol].getColor());
+        
+                return board[i][j] == null || !board[i][j].getColor().equals(board[startRow][startCol].getColor());
             }
             return false;
         }
         
-
         public boolean isValidQueenMove(int i, int j, int startRow, int startCol, Piece[][] board) {
-            if (i == startRow) {
-                int start = Math.min(j, startCol);
-                int end = Math.max(j, startCol);
-                for (int k = start + 1; k < end; k++) {
-                    if(board[i][k] != null) {
-                        return false;
-                    }
-                }
-                return board[i][end] == null || !board[i][end].getColor().equals(board[startRow][startCol].getColor());
-            }
-            else if (j == startCol) {
-                int start = Math.min(i, startRow);
-                int end = Math.max(i, startRow);
-                for (int k = start + 1; k < end; k++) {
-                    if (board[k][j] != null) {
-                        return false;
-                    }
-                }
-                return board[end][j] == null || !board[end][j].getColor().equals(board[start][startCol].getColor());
-            }
-            else if (Math.abs(i - startRow) == Math.abs(j - startCol)) {
-                int RowDirection = (i - startRow) > 0 ? 1 : -1;
-                int ColDirection = (j - startCol) > 0 ? 1 : -1;
-                int row = startRow + RowDirection;
-                int col = startCol + ColDirection;
-                while (row != i && col != j){
-                    if (board[row][col] != null) {
-                        return false;
-                    }
-                    row += RowDirection;
-                    col += ColDirection;
-                }
-                return board [i][j] == null || !board[i][j].getColor().equals(board[startRow][startCol].getColor());
-            }
-            return false;
+            return isValidRookMove(i, j, startRow, startCol, board) || isValidBishopMove(i, j, startRow, startCol);
         }
+        
 
         public boolean isValidKingMove(int i, int j, int startRow, int startCol, Piece[][] board) {
-            return Math.abs(i - startRow) <= 1 && Math.abs(j - startCol) <= 1;
-        }
+
+            boolean isMoveInRange = Math.abs(i - startRow) <= 1 && Math.abs(j - startCol) <= 1;
+            
+            boolean isTargetSquareValid = board[i][j] == null || !board[i][j].getColor().equals(board[startRow][startCol].getColor());
+            
+            return isMoveInRange && isTargetSquareValid;
+        }        
+        
     }
 }
